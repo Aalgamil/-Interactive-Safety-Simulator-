@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "dev",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "owner": "typescript",
+          "pattern": "$tsc",
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*(Local:.*)?.*webpack\\.start.*$",
+            "endsPattern": "^.*webpack\\.end.*$"
+          }
+        },
+        {
+          "owner": "javascript",
+          "fileLocation": ["relative", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):(\\d+)\\s+(.*)$"
+          }
+        }
+      ]
+    }
+  ]
+}
