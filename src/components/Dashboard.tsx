@@ -1,4 +1,4 @@
-import { Shield, Target, Zap, Trophy, LogOut, User } from 'lucide-react';
+import { Shield, Target, Zap, Trophy, LogOut, User, BarChart3 } from 'lucide-react';
 import type { Page, User as UserType } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
@@ -25,6 +25,13 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
             </div>
             <div className="flex items-center gap-4">
               <LanguageToggle />
+              <button
+                onClick={() => onNavigate('dataTables')}
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+              >
+                <BarChart3 className="size-4" />
+                Data Tables
+              </button>
               <div className="flex items-center gap-2">
                 <User className="size-5" />
                 <span>{user.username}</span>

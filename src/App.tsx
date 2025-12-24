@@ -6,6 +6,7 @@ import { Dashboard } from './components/Dashboard';
 import { AccidentSimulation } from './components/AccidentSimulation';
 import { EmergencyReportingGame } from './components/EmergencyReportingGame';
 import { CybercrimeGame } from './components/CybercrimeGame';
+import { DataTables } from './components/DataTables';
 
 export type User = {
   id: string;
@@ -18,7 +19,7 @@ export type User = {
   };
 };
 
-export type Page = 'home' | 'login' | 'dashboard' | 'accident' | 'emergency' | 'cybercrime';
+export type Page = 'home' | 'login' | 'dashboard' | 'accident' | 'emergency' | 'cybercrime' | 'dataTables';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -125,6 +126,9 @@ export default function App() {
             onComplete={(score) => updateScore('cybercrimeDetection', score)}
             onBack={() => navigateTo('dashboard')}
           />
+        )}
+        {currentPage === 'dataTables' && (
+          <DataTables onNavigate={navigateTo} />
         )}
       </div>
     </LanguageProvider>

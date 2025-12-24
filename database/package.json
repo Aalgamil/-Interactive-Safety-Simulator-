@@ -1,0 +1,39 @@
+{
+    "name": "interactive-safety-simulator-database",
+    "version": "1.0.0",
+    "description": "Database utilities and connection management for Interactive Safety Simulator",
+    "main": "database-connection.js",
+    "scripts": {
+        "setup": "npm install && node setup-database.js",
+        "test-connection": "node test-connection.js",
+        "migrate": "node migration-runner.js",
+        "backup": "node backup-database.js",
+        "restore": "node restore-database.js",
+        "maintenance": "node maintenance-tasks.js",
+        "seed-data": "node seed-data.js"
+    },
+    "keywords": [
+        "database",
+        "mysql",
+        "safety",
+        "simulator",
+        "crud",
+        "erd"
+    ],
+    "author": "Interactive Safety Simulator Team",
+    "license": "MIT",
+    "dependencies": {
+        "mysql2": "^3.6.0",
+        "bcryptjs": "^2.4.3",
+        "dotenv": "^16.3.1",
+        "moment": "^2.29.4"
+    },
+    "devDependencies": {
+        "@types/node": "^20.5.0",
+        "@types/bcryptjs": "^2.4.2",
+        "typescript": "^5.1.6"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

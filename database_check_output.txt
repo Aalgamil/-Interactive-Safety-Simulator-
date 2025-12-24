@@ -1,0 +1,6 @@
+[dotenv@17.2.3] injecting env (6) from .env -- tip: ظأآي╕  override existing env vars with { override: true }
+Checking database connection...
+ظ£ô Connected to MySQL server
+ظ£ô Database exists
+ظ£ô Tables found: accident_scenarios, cybercrime_messages, emergency_scenarios, user_responses, user_score_summary, user_sessions, users
+Database check completed
