@@ -33,7 +33,6 @@ export function LeaderboardTable() {
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching leaderboard:', err);
       } finally {
         setLoading(false);
       }

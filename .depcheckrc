@@ -1,0 +1,7 @@
+entry:
+- server.js
+- src/main.tsx
+- vite.config.ts
+ignores:
+- bcryptjs
+- typescript

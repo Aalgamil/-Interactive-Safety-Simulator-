@@ -2,7 +2,8 @@
 
 ## Overview
 
-This guide provides comprehensive CRUD (Create, Read, Update, Delete) operations for the Interactive Safety Simulator database. Each operation includes multiple examples with proper error handling and validation.
+This guide covers CRUD operations for the Interactive Safety Simulator database.
+Each operation includes multiple examples with proper error handling and validation.
 
 ## Database Connection Setup
 
@@ -71,10 +72,11 @@ WHERE is_active = TRUE
 ORDER BY created_at DESC;
 
 -- Get user statistics
-SELECT 
+SELECT
     COUNT(*) as total_users,
     COUNT(CASE WHEN is_active = TRUE THEN 1 END) as active_users,
-    COUNT(CASE WHEN last_login >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as recent_logins
+    COUNT(CASE WHEN last_login >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END)
+    as recent_logins
 FROM Users;
 ```
 
@@ -141,10 +143,12 @@ INSERT INTO Accident_Scenarios (
 
 -- Example:
 INSERT INTO Accident_Scenarios (
-    'Workplace Injury', 'A colleague has cut their hand on machinery', 
-    'What should you do first?', 'Apply a bandage', 'Call for first aid assistance', 
-    'Clean the wound with water', 'Take a photo for documentation', 
-    'B', 'Always prioritize getting professional medical help for serious injuries', 
+    'Workplace Injury', 'A colleague has cut their hand on machinery',
+    'What should you do first?',
+    'Apply a bandage', 'Call for first aid assistance',
+    'Clean the wound with water', 'Take a photo for documentation',
+    'B',
+    'Always prioritize getting professional medical help for serious injuries',
     'medium', 'workplace_safety'
 );
 ```
@@ -160,9 +164,10 @@ INSERT INTO Emergency_Scenarios (
 
 -- Example:
 INSERT INTO Emergency_Scenarios (
-    'Office Fire Alarm', 'Fire alarm sounds in the office building', 
-    'fire', 'Evacuate immediately following emergency procedures', 
-    'Investigate the source of the alarm', 'Continue working until told otherwise', 
+    'Office Fire Alarm', 'Fire alarm sounds in the office building',
+    'fire', 'Evacuate immediately following emergency procedures',
+    'Investigate the source of the alarm',
+    'Continue working until told otherwise',
     '997', 'high'
 );
 ```
@@ -524,9 +529,11 @@ INSERT INTO Accident_Scenarios (
     title, scenario_description, question_text,
     option_a, option_b, option_c, option_d,
     correct_answer, explanation, difficulty_level, category
-) VALUES 
-    ('Scenario 1', 'Description 1', 'Question 1', 'A1', 'B1', 'C1', 'D1', 'A', 'Explanation 1', 'easy', 'cat1'),
-    ('Scenario 2', 'Description 2', 'Question 2', 'A2', 'B2', 'C2', 'D2', 'B', 'Explanation 2', 'medium', 'cat2')
+) VALUES
+    ('Scenario 1', 'Description 1', 'Question 1', 'A1', 'B1', 'C1', 'D1',
+    'A', 'Explanation 1', 'easy', 'cat1'),
+    ('Scenario 2', 'Description 2', 'Question 2', 'A2', 'B2', 'C2', 'D2',
+    'B', 'Explanation 2', 'medium', 'cat2')
 ON DUPLICATE KEY UPDATE
     scenario_description = VALUES(scenario_description),
     explanation = VALUES(explanation);
@@ -663,8 +670,9 @@ VALUES (?, ?, ?);
 SET @session_id = LAST_INSERT_ID();
 
 -- Record responses
-INSERT INTO User_Responses (session_id, scenario_id, module_type, user_answer, is_correct, response_time) 
-VALUES 
+INSERT INTO User_Responses (session_id, scenario_id, module_type,
+    user_answer, is_correct, response_time)
+VALUES
     (@session_id, ?, ?, ?, ?, ?),
     (@session_id, ?, ?, ?, ?, ?);
 
@@ -715,4 +723,6 @@ EXCEPTION
 END;
 ```
 
-This comprehensive CRUD guide provides all necessary operations for managing the Interactive Safety Simulator database effectively.
+This comprehensive CRUD guide provides all necessary operations for managing the
+Interactive Safety Simulator database
+effectively.

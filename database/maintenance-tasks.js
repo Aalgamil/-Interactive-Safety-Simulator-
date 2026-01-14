@@ -24,7 +24,6 @@ class DatabaseMaintenance {
             const [rows] = await connection.execute(query, params);
             return rows;
         } catch (error) {
-            console.error('Query execution failed:', error);
             throw error;
         } finally {
             connection.release();
@@ -46,7 +45,6 @@ class DatabaseMaintenance {
             return results;
         } catch (error) {
             await connection.rollback();
-            console.error('Transaction failed:', error);
             throw error;
         } finally {
             connection.release();
@@ -55,8 +53,6 @@ class DatabaseMaintenance {
 
     // Archive old sessions (older than 6 months)
     async archiveOldSessions() {
-        console.log('Starting to archive old sessions...');
-
         try {
             // Create archive table if it doesn't exist
             await this.executeQuery(`
@@ -91,8 +87,6 @@ class DatabaseMaintenance {
                 AND end_time < DATE_SUB(NOW(), INTERVAL 6 MONTH)
             `);
 
-            console.log(`Archived ${archivedCount.length} old sessions`);
-
             // Delete archived sessions from main table
             const deletedCount = await this.executeQuery(`
                 DELETE FROM User_Sessions 
@@ -100,19 +94,15 @@ class DatabaseMaintenance {
                 AND end_time < DATE_SUB(NOW(), INTERVAL 6 MONTH)
             `);
 
-            console.log(`Deleted ${deletedCount.affectedRows} sessions from main table`);
             return archivedCount.length;
 
         } catch (error) {
-            console.error('Failed to archive old sessions:', error);
             throw error;
         }
     }
 
     // Remove orphaned responses
     async cleanupOrphanedResponses() {
-        console.log('Cleaning up orphaned responses...');
-
         try {
             const deletedCount = await this.executeQuery(`
                 DELETE ur FROM User_Responses ur
@@ -120,19 +110,15 @@ class DatabaseMaintenance {
                 WHERE us.session_id IS NULL
             `);
 
-            console.log(`Removed ${deletedCount.affectedRows} orphaned responses`);
             return deletedCount.affectedRows;
 
         } catch (error) {
-            console.error('Failed to cleanup orphaned responses:', error);
             throw error;
         }
     }
 
     // Update table statistics
     async analyzeTableStatistics() {
-        console.log('Analyzing table statistics...');
-
         const tables = [
             'Users', 'Accident_Scenarios', 'Emergency_Scenarios',
             'Cybercrime_Messages', 'User_Sessions', 'User_Responses',
@@ -142,17 +128,13 @@ class DatabaseMaintenance {
         for (const table of tables) {
             try {
                 await this.executeQuery(`ANALYZE TABLE ${table}`);
-                console.log(`Analyzed table: ${table}`);
             } catch (error) {
-                console.error(`Failed to analyze table ${table}:`, error);
             }
         }
     }
 
     // Optimize tables
     async optimizeTables() {
-        console.log('Optimizing tables...');
-
         const tables = [
             'Users', 'Accident_Scenarios', 'Emergency_Scenarios',
             'Cybercrime_Messages', 'User_Sessions', 'User_Responses',
@@ -162,17 +144,13 @@ class DatabaseMaintenance {
         for (const table of tables) {
             try {
                 await this.executeQuery(`OPTIMIZE TABLE ${table}`);
-                console.log(`Optimized table: ${table}`);
             } catch (error) {
-                console.error(`Failed to optimize table ${table}:`, error);
             }
         }
     }
 
     // Check table integrity
     async checkTableIntegrity() {
-        console.log('Checking table integrity...');
-
         const tables = [
             'Users', 'Accident_Scenarios', 'Emergency_Scenarios',
             'Cybercrime_Messages', 'User_Sessions', 'User_Responses',
@@ -185,9 +163,7 @@ class DatabaseMaintenance {
             try {
                 const result = await this.executeQuery(`CHECK TABLE ${table}`);
                 results[table] = result[0];
-                console.log(`Checked table ${table}:`, result[0].Msg_text);
             } catch (error) {
-                console.error(`Failed to check table ${table}:`, error);
                 results[table] = { Msg_text: 'Error checking table' };
             }
         }
@@ -197,8 +173,6 @@ class DatabaseMaintenance {
 
     // Clean up inactive users
     async cleanupInactiveUsers() {
-        console.log('Cleaning up inactive users...');
-
         try {
             // Deactivate users who haven't logged in for 2 years and never completed any session
             const deactivatedCount = await this.executeQuery(`
@@ -213,19 +187,15 @@ class DatabaseMaintenance {
                 )
             `);
 
-            console.log(`Deactivated ${deactivatedCount.affectedRows} inactive users`);
             return deactivatedCount.affectedRows;
 
         } catch (error) {
-            console.error('Failed to cleanup inactive users:', error);
             throw error;
         }
     }
 
     // Generate maintenance report
     async generateMaintenanceReport() {
-        console.log('Generating maintenance report...');
-
         const report = {
             timestamp: new Date().toISOString(),
             tables: {},
@@ -253,7 +223,6 @@ class DatabaseMaintenance {
             }, {});
 
         } catch (error) {
-            console.error('Failed to get table sizes:', error);
         }
 
         // Get statistics
@@ -271,20 +240,13 @@ class DatabaseMaintenance {
             report.statistics = stats[0];
 
         } catch (error) {
-            console.error('Failed to get statistics:', error);
         }
-
-        console.log('Maintenance report generated:');
-        console.log(JSON.stringify(report, null, 2));
 
         return report;
     }
 
     // Complete maintenance cycle
     async runMaintenanceCycle() {
-        console.log('Starting complete maintenance cycle...');
-        console.log('='.repeat(50));
-
         try {
             // Step 1: Generate report before maintenance
             const initialReport = await this.generateMaintenanceReport();
@@ -310,13 +272,6 @@ class DatabaseMaintenance {
             // Step 8: Generate final report
             const finalReport = await this.generateMaintenanceReport();
 
-            console.log('='.repeat(50));
-            console.log('Maintenance cycle completed successfully!');
-            console.log(`Archived sessions: ${archivedCount}`);
-            console.log(`Cleaned orphaned responses: ${cleanedResponses}`);
-            console.log(`Deactivated inactive users: ${deactivatedUsers}`);
-            console.log('Table integrity check completed');
-
             return {
                 success: true,
                 archivedCount,
@@ -328,7 +283,6 @@ class DatabaseMaintenance {
             };
 
         } catch (error) {
-            console.error('Maintenance cycle failed:', error);
             throw error;
         }
     }
@@ -336,7 +290,6 @@ class DatabaseMaintenance {
     async close() {
         if (this.pool) {
             await this.pool.end();
-            console.log('Database maintenance connection closed');
         }
     }
 }
@@ -385,7 +338,6 @@ if (require.main === module) {
             }
 
         } catch (error) {
-            console.error('Maintenance task failed:', error);
             process.exit(1);
         } finally {
             await maintenance.close();

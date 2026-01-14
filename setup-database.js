@@ -5,21 +5,17 @@ require('dotenv').config();
 
 async function setupDatabase() {
   try {
-    console.log('Setting up database...');
-
     // Connect to MySQL server
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '3306'),
       user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || ''
+      password: process.env.DB_PASSWORD || '',
+      charset: 'utf8mb4'
     });
-
-    console.log('✓ Connected to MySQL server');
 
     // Create database if it doesn't exist
     await connection.execute(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || 'safety_simulator'} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-    console.log('✓ Database ensured');
 
     // Connect to the database
     await connection.changeUser({ database: process.env.DB_NAME || 'safety_simulator' });
@@ -37,13 +33,9 @@ async function setupDatabase() {
       }
     }
 
-    console.log('✓ Tables created successfully');
-
     await connection.end();
-    console.log('Database setup completed successfully!');
 
   } catch (error) {
-    console.error('Database setup error:', error.message);
   }
 }
 

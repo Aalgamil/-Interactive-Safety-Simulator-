@@ -13,6 +13,7 @@ import {
   cyberMessages,
   type MessageType,
 } from "../data/cybercrimeMessages";
+import "./CybercrimeGame.css";
 
 interface CybercrimeGameProps {
   onComplete: (score: number) => void;
@@ -68,8 +69,8 @@ export function CybercrimeGame({
         const finalScore = Math.min(
           Math.round(
             ((score + (isCorrect ? 10 : 0)) /
-              cyberMessages.length) *
-              10,
+              (cyberMessages.length * 10)) *
+            100,
           ),
           100,
         );
@@ -90,7 +91,7 @@ export function CybercrimeGame({
 
   if (isComplete) {
     const finalScore = Math.min(
-      Math.round((score / cyberMessages.length) * 10),
+      Math.round((score / (cyberMessages.length * 10)) * 100),
       100,
     );
     const accuracy = Math.round(
@@ -196,9 +197,9 @@ export function CybercrimeGame({
           <div className="mb-8">
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-[#006B3F] h-3 rounded-full transition-all"
+                className="progress-fill"
                 style={{
-                  width: `${((currentMessage + 1) / cyberMessages.length) * 100}%`,
+                  ['--progress-width' as string]: `${((currentMessage + 1) / cyberMessages.length) * 100}%`,
                 }}
               />
             </div>
@@ -246,15 +247,14 @@ export function CybercrimeGame({
                   <button
                     onClick={() => handleAnswer(true)}
                     disabled={showFeedback}
-                    className={`p-6 rounded-xl border-4 transition-all ${
-                      showFeedback && selectedAnswer === true
-                        ? message.isScam
-                          ? "border-green-500 bg-green-50"
-                          : "border-red-500 bg-red-50"
-                        : showFeedback
-                          ? "border-gray-200 opacity-50 cursor-not-allowed"
-                          : "border-red-600 hover:bg-red-50 cursor-pointer"
-                    }`}
+                    className={`p-6 rounded-xl border-4 transition-all ${showFeedback && selectedAnswer === true
+                      ? message.isScam
+                        ? "border-green-500 bg-green-50"
+                        : "border-red-500 bg-red-50"
+                      : showFeedback
+                        ? "border-gray-200 opacity-50 cursor-not-allowed"
+                        : "border-red-600 hover:bg-red-50 cursor-pointer"
+                      }`}
                   >
                     <div className="flex flex-col items-center gap-3">
                       {showFeedback &&
@@ -274,15 +274,14 @@ export function CybercrimeGame({
                   <button
                     onClick={() => handleAnswer(false)}
                     disabled={showFeedback}
-                    className={`p-6 rounded-xl border-4 transition-all ${
-                      showFeedback && selectedAnswer === false
-                        ? !message.isScam
-                          ? "border-green-500 bg-green-50"
-                          : "border-red-500 bg-red-50"
-                        : showFeedback
-                          ? "border-gray-200 opacity-50 cursor-not-allowed"
-                          : "border-green-600 hover:bg-green-50 cursor-pointer"
-                    }`}
+                    className={`p-6 rounded-xl border-4 transition-all ${showFeedback && selectedAnswer === false
+                      ? !message.isScam
+                        ? "border-green-500 bg-green-50"
+                        : "border-red-500 bg-red-50"
+                      : showFeedback
+                        ? "border-gray-200 opacity-50 cursor-not-allowed"
+                        : "border-green-600 hover:bg-green-50 cursor-pointer"
+                      }`}
                   >
                     <div className="flex flex-col items-center gap-3">
                       {showFeedback &&
@@ -306,11 +305,10 @@ export function CybercrimeGame({
           {/* Feedback */}
           {showFeedback && (
             <div
-              className={`bg-white rounded-xl shadow-lg p-6 ${
-                selectedAnswer === message.isScam
-                  ? "border-2 border-green-500"
-                  : "border-2 border-red-500"
-              }`}
+              className={`bg-white rounded-xl shadow-lg p-6 ${selectedAnswer === message.isScam
+                ? "border-2 border-green-500"
+                : "border-2 border-red-500"
+                }`}
             >
               <div className="flex items-start gap-3 mb-4">
                 {selectedAnswer === message.isScam ? (
@@ -320,11 +318,10 @@ export function CybercrimeGame({
                 )}
                 <div>
                   <h3
-                    className={`text-xl mb-2 ${
-                      selectedAnswer === message.isScam
-                        ? "text-green-800"
-                        : "text-red-800"
-                    }`}
+                    className={`text-xl mb-2 ${selectedAnswer === message.isScam
+                      ? "text-green-800"
+                      : "text-red-800"
+                      }`}
                   >
                     {selectedAnswer === message.isScam
                       ? t("cyber.correct")

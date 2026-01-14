@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, Clock } from 'lucide-react';
+import { Progress } from './ui/progress';
+import './AnalyticsTable.css';
 
 interface EngagementData {
   date: string;
@@ -44,7 +46,6 @@ export function AnalyticsTable() {
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching analytics:', err);
       } finally {
         setLoading(false);
       }
@@ -147,12 +148,7 @@ export function AnalyticsTable() {
                       <div className="text-sm font-medium text-[#006B3F] mr-2">
                         {entry.active_users}
                       </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-[#006B3F] h-2 rounded-full"
-                          style={{ width: `${Math.min(entry.active_users * 5, 100)}%` }}
-                        ></div>
-                      </div>
+                      <Progress value={Math.min(entry.active_users * 5, 100)} className="w-24" />
                     </div>
                   </td>
                 </tr>
@@ -211,12 +207,7 @@ export function AnalyticsTable() {
                       <div className="text-sm font-medium text-[#006B3F] mr-2">
                         {entry.session_count}
                       </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-[#006B3F] h-2 rounded-full"
-                          style={{ width: `${Math.min(entry.session_count * 2, 100)}%` }}
-                        ></div>
-                      </div>
+                      <Progress value={Math.min(entry.session_count * 2, 100)} className="w-24" />
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -225,12 +216,7 @@ export function AnalyticsTable() {
                         {entry.avg_score ? entry.avg_score.toFixed(1) : 'N/A'}
                       </div>
                       {entry.avg_score && (
-                        <div className="w-24 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-green-500 h-2 rounded-full"
-                            style={{ width: `${entry.avg_score}%` }}
-                          ></div>
-                        </div>
+                        <Progress value={entry.avg_score} className="w-24 progress-green" />
                       )}
                     </div>
                   </td>

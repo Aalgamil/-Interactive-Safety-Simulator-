@@ -3,22 +3,18 @@ require('dotenv').config();
 
 async function testDatabaseConnection() {
   try {
-    console.log('Testing database connection...');
-
     // Connect to the database
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '3306'),
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'safety_simulator'
+      database: process.env.DB_NAME || 'safety_simulator',
+      charset: 'utf8mb4'
     });
-
-    console.log('✓ Connected to database successfully');
 
     // Test a simple query
     const [rows] = await connection.execute('SELECT COUNT(*) as userCount FROM Users');
-    console.log(`✓ Found ${rows[0].userCount} users in the database`);
 
     // Test the leaderboard query
     const [leaderboard] = await connection.execute(`
@@ -38,15 +34,9 @@ async function testDatabaseConnection() {
       LIMIT 5
     `);
 
-    console.log('✓ Leaderboard query executed successfully');
-    console.log('Sample leaderboard data:', leaderboard);
-
     await connection.end();
-    console.log('Database connection test completed successfully!');
 
   } catch (error) {
-    console.error('Database connection test failed:', error.message);
-    console.error('Full error:', error);
   }
 }
 

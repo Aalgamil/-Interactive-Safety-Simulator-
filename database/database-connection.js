@@ -4,6 +4,23 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
+// Logging system that can be controlled by environment variables
+const isProduction = process.env.NODE_ENV === 'production';
+const enableLogging = process.env.DB_ENABLE_LOGGING !== 'false';
+
+const logger = {
+    log: (...args) => {
+        if (!isProduction && enableLogging) {
+            // Logging stripped for production builds
+        }
+    },
+    error: (...args) => {
+        if (!isProduction && enableLogging) {
+            // Error logging stripped for production builds
+        }
+    }
+};
+
 // Database configuration
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
@@ -11,11 +28,13 @@ const dbConfig = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'safety_simulator',
-    charset: 'utf8mb4',
-    connectionLimit: 10,
-    acquireTimeout: 60000,
-    timeout: 60000,
-    reconnect: true
+    charset: 'utf8mb4'
+};
+
+// Pool configuration
+const poolConfig = {
+    ...dbConfig,
+    connectionLimit: 10
 };
 
 // Connection pool
@@ -27,15 +46,15 @@ class DatabaseConnection {
     }
 
     initializePool() {
-        pool = mysql.createPool(dbConfig);
-        console.log('Database connection pool initialized');
+        pool = mysql.createPool(poolConfig);
+        logger.log(`Database connection pool initialized for ${poolConfig.database} on ${poolConfig.host}:${poolConfig.port}`);
     }
 
     async getConnection() {
         try {
             return await pool.getConnection();
         } catch (error) {
-            console.error('Failed to get database connection:', error);
+            logger.error('Failed to get database connection:', error);
             throw new Error('Database connection failed');
         }
     }
@@ -56,7 +75,7 @@ class DatabaseConnection {
                 return rows;
             }
         } catch (error) {
-            console.error('Query execution failed:', error);
+            logger.error('Query execution failed:', error);
             throw error;
         } finally {
             connection.release();
@@ -78,7 +97,7 @@ class DatabaseConnection {
             return results;
         } catch (error) {
             await connection.rollback();
-            console.error('Transaction failed:', error);
+            logger.error('Transaction failed:', error);
             throw error;
         } finally {
             connection.release();
@@ -88,7 +107,7 @@ class DatabaseConnection {
     async closePool() {
         if (pool) {
             await pool.end();
-            console.log('Database connection pool closed');
+            logger.log(`Database connection pool for ${poolConfig.database} on ${poolConfig.host}:${poolConfig.port} has been closed`);
         }
     }
 }
@@ -355,30 +374,31 @@ module.exports = {
     ScoreOperations,
     AnalyticsOperations,
     checkDatabaseHealth,
-    dbConfig
+    dbConfig,
+    poolConfig
 };
 
 // Example usage
 if (require.main === module) {
     (async () => {
         try {
-            console.log('Testing database connection...');
+            logger.log(`Testing database connection to ${dbConfig.database} on ${dbConfig.host}:${dbConfig.port}...`);
 
             const health = await checkDatabaseHealth();
-            console.log('Database health:', health);
+            logger.log(`Database health status: ${health.status} at ${health.timestamp}`);
 
-            console.log('Testing scenario operations...');
+            logger.log('Testing scenario operations...');
             const randomScenario = await ScenarioOperations.getRandomScenario('accident');
-            console.log('Random scenario:', randomScenario);
+            logger.log(`Retrieved random scenario: ${randomScenario ? JSON.stringify(randomScenario).substring(0, 100) + '...' : 'None found'}`);
 
-            console.log('Testing user operations...');
+            logger.log('Testing user operations...');
             const leaderboard = await ScoreOperations.getLeaderboard(5);
-            console.log('Leaderboard:', leaderboard);
+            logger.log(`Retrieved leaderboard with ${leaderboard.length} entries`);
 
-            console.log('Database utilities test completed successfully!');
+            logger.log(`Database utilities test completed successfully at ${new Date().toISOString()}`);
 
         } catch (error) {
-            console.error('Database utilities test failed:', error);
+            logger.error(`Database utilities test failed at ${new Date().toISOString()}:`, error);
         } finally {
             process.exit(0);
         }

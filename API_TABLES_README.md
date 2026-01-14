@@ -1,14 +1,17 @@
 
 # API Data Tables
 
-This document explains how to use the new API data tables feature in the Interactive Safety Simulator.
+This document explains how to use the new API data tables feature in the
+Interactive Safety Simulator.
 
 ## Overview
 
-The Interactive Safety Simulator now includes a data tables feature that allows you to view and analyze data from the backend API in HTML tables. This includes:
+The Interactive Safety Simulator now includes a data tables feature that allows
+
+you to view and analyze data from the backend API in HTML tables. This includes:
 
 1. **Leaderboard Table** - Displays top players and their scores
-2. **Analytics Table** - Shows user engagement statistics and module performance data
+2. **Analytics Table** - Shows user engagement stats and module performance data
 
 ## How to Run the Application
 
@@ -93,7 +96,9 @@ The following API endpoints are available:
 
 ### Database Integration
 
-The application uses the existing database connection utilities in `database/database-connection.js` to fetch data from the MySQL database.
+The application uses the existing database connection utilities in
+
+`database/database-connection.js` to fetch data from the MySQL database.
 
 ## Customization
 

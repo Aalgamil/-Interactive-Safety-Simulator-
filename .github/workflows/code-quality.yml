@@ -29,3 +29,6 @@ jobs:
 
     - name: Check for unused dependencies
       run: npx depcheck
+
+    - name: Check for linting issues
+      run: npm run lint --if-present

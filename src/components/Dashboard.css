@@ -1,0 +1,7 @@
+.progress-fill {
+    background-color: #006B3F;
+    height: 12px;
+    border-radius: 6px;
+    transition: all;
+    width: var(--progress-width);
+}

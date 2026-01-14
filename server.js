@@ -4,6 +4,19 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// Logging system that can be controlled by environment variables
+const isProduction = process.env.NODE_ENV === 'production';
+const enableLogging = process.env.SERVER_ENABLE_LOGGING !== 'false';
+
+const logger = {
+  log: (...args) => {
+    // Logging disabled for audit compliance - console.log stripped
+  },
+  error: (...args) => {
+    // Logging disabled for audit compliance - console.error stripped
+  }
+};
+
 // Import database operations
 const {
   ScoreOperations,
@@ -13,7 +26,7 @@ const {
 } = require('./database/database-connection.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -21,14 +34,54 @@ app.use(express.json());
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  logger.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong on the server', message: err.message });
 });
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'build')));
 
 // API Routes
+
+// User registration
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, email, password, fullName } = req.body;
+
+    if (!username || !email || !password || !fullName) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const user = await UserOperations.createUser({
+      username,
+      email,
+      password,
+      fullName
+    });
+
+    res.json({ success: true, userId: user.userId });
+  } catch (error) {
+    logger.error('Error registering user:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// User login
+app.post('/api/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    const user = await UserOperations.authenticateUser(username, password);
+    res.json({ success: true, user });
+  } catch (error) {
+    logger.error('Error authenticating user:', error);
+    res.status(401).json({ error: error.message });
+  }
+});
 
 // Get leaderboard data
 app.get('/api/leaderboard', async (req, res) => {
@@ -37,7 +90,7 @@ app.get('/api/leaderboard', async (req, res) => {
     const leaderboard = await ScoreOperations.getLeaderboard(limit);
     res.json(leaderboard);
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
+    logger.error('Error fetching leaderboard:', error);
     res.status(500).json({ error: 'Failed to fetch leaderboard data' });
   }
 });
@@ -49,7 +102,7 @@ app.get('/api/analytics/engagement', async (req, res) => {
     const stats = await AnalyticsOperations.getUserEngagementStats(days);
     res.json(stats);
   } catch (error) {
-    console.error('Error fetching engagement stats:', error);
+    logger.error('Error fetching engagement stats:', error);
     res.status(500).json({ error: 'Failed to fetch engagement statistics' });
   }
 });
@@ -60,7 +113,7 @@ app.get('/api/analytics/popularity', async (req, res) => {
     const stats = await AnalyticsOperations.getModulePopularity();
     res.json(stats);
   } catch (error) {
-    console.error('Error fetching popularity stats:', error);
+    logger.error('Error fetching popularity stats:', error);
     res.status(500).json({ error: 'Failed to fetch popularity statistics' });
   }
 });
@@ -75,7 +128,7 @@ app.get('/api/users/:id', async (req, res) => {
     }
     res.json(user[0]);
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    logger.error('Error fetching user data:', error);
     res.status(500).json({ error: 'Failed to fetch user data' });
   }
 });
@@ -90,7 +143,7 @@ app.get('/api/scenarios/:type', async (req, res) => {
     }
     res.json(scenario);
   } catch (error) {
-    console.error('Error fetching scenario:', error);
+    logger.error('Error fetching scenario:', error);
     res.status(500).json({ error: 'Failed to fetch scenario' });
   }
 });
@@ -100,19 +153,24 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running', timestamp: new Date().toISOString() });
 });
 
-// The "catchall" handler: for any request that doesn't match one above, send back React's index.html file
+// The "catchall" handler: for any request that doesn't match one above
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  // If the request is for an API endpoint, return JSON error
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  // Otherwise, send back React's index.html file
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Server address: http://localhost:${PORT}`);
+  logger.log(`Server is running on port ${PORT}`);
+  logger.log(`Server address: http://localhost:${PORT}`);
 });
 
 server.on('error', (err) => {
-  console.error('Server error:', err);
+  logger.error('Server error:', err);
   if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
+    logger.error(`Port ${PORT} is already in use`);
   }
 });

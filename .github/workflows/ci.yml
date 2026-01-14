@@ -1,65 +1,75 @@
-
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: safety_simulator
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 3306:3306
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: safety_simulator
+      NODE_ENV: test
 
     strategy:
       matrix:
         node-version: [18.x, 20.x]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build project
-      run: npm run build
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+          echo "MySQL is ready"
 
-    - name: Run server (background)
-      run: npm run server &
+      - name: Setup database
+        run: mysql -h 127.0.0.1 -P 3306 -u root -proot < database/create_tables.sql
 
-    - name: Wait for server to start
-      run: sleep 10
+      - name: Build project
+        run: npm run build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-files
-        path: build/
+      - name: Run server (background)
+        run: npm run server &
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+      - name: Wait for server to start
+        run: sleep 10
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Test server health
+        run: curl -f http://localhost:3001/api/health
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-files
-        path: build/
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: build/

@@ -28,14 +28,12 @@ class DatabaseConnection {
 
     initializePool() {
         pool = mysql.createPool(dbConfig);
-        console.log('Database connection pool initialized');
     }
 
     async getConnection() {
         try {
             return await pool.getConnection();
         } catch (error) {
-            console.error('Failed to get database connection:', error);
             throw new Error('Database connection failed');
         }
     }
@@ -56,7 +54,6 @@ class DatabaseConnection {
                 return rows;
             }
         } catch (error) {
-            console.error('Query execution failed:', error);
             throw error;
         } finally {
             connection.release();
@@ -78,7 +75,6 @@ class DatabaseConnection {
             return results;
         } catch (error) {
             await connection.rollback();
-            console.error('Transaction failed:', error);
             throw error;
         } finally {
             connection.release();
@@ -88,7 +84,6 @@ class DatabaseConnection {
     async closePool() {
         if (pool) {
             await pool.end();
-            console.log('Database connection pool closed');
         }
     }
 }

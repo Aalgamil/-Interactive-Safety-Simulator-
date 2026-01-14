@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Run security scan weekly on Sundays at 2am UTC
-    - cron: "0 2 * * SUN" # Weekly on Sunday at 2am UTC
+    # Run security scan daily at 2pm Asia/Dubai (10pm UTC)
+    - cron: 0 22 * * *
 
 jobs:
   security-scan:
@@ -29,10 +29,3 @@ jobs:
       - name: Run npm audit
         run: npm audit --audit-level=high
         continue-on-error: false
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high

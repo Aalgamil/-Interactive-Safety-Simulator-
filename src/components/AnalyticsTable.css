@@ -1,0 +1,11 @@
+[data-slot="progress"] {
+    background-color: #e5e7eb;
+}
+
+[data-slot="progress-indicator"] {
+    background-color: #006B3F;
+}
+
+.progress-green [data-slot="progress-indicator"] {
+    background-color: #22c55e;
+}

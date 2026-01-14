@@ -1,8 +1,8 @@
 // Database Connection Utility for Interactive Safety Simulator
 // This file provides connection management and utility functions
 
-import mysql from 'mysql2';
-import bcrypt from 'bcryptjs';
+import mysql, { Pool, PoolConnection } from 'mysql2/promise';
+import * as bcrypt from 'bcryptjs';
 
 // Database configuration
 const dbConfig = {
@@ -19,7 +19,7 @@ const dbConfig = {
 };
 
 // Connection pool
-let pool: mysql.Pool;
+let pool: Pool;
 
 export class DatabaseConnection {
     private static instance: DatabaseConnection;
@@ -40,7 +40,7 @@ export class DatabaseConnection {
         console.log('Database connection pool initialized');
     }
 
-    public async getConnection(): Promise<mysql.PoolConnection> {
+    public async getConnection(): Promise<PoolConnection> {
         try {
             return await pool.getConnection();
         } catch (error) {
@@ -52,7 +52,7 @@ export class DatabaseConnection {
     public async executeQuery(query: string, params: any[] = []): Promise<any> {
         const connection = await this.getConnection();
         try {
-            const [rows] = await connection.execute(query, params);
+            const [rows, fields] = await connection.execute(query, params);
             return rows;
         } catch (error) {
             console.error('Query execution failed:', error);
@@ -69,7 +69,7 @@ export class DatabaseConnection {
 
             const results = [];
             for (const { query, params } of queries) {
-                const [rows] = await connection.execute(query, params);
+                const [rows, fields] = await connection.execute(query, params);
                 results.push(rows);
             }
 
@@ -115,7 +115,8 @@ export class UserOperations {
         ];
 
         const results = await DatabaseConnection.getInstance().executeTransaction(queries);
-        return { userId: results[0].insertId };
+        const insertResult = results[0] as any;
+        return { userId: insertResult.insertId };
     }
 
     static async authenticateUser(username: string, password: string): Promise<any> {
@@ -236,7 +237,8 @@ export class SessionOperations {
             VALUES (?, ?, ?)
         `, [userId, moduleType, scenarioId]);
 
-        return { sessionId: result.insertId };
+        const insertResult = result as any;
+        return { sessionId: insertResult.insertId };
     }
 
     static async recordResponse(sessionId: number, scenarioId: number, moduleType: string, userAnswer: string, isCorrect: boolean, responseTime: number): Promise<void> {
@@ -346,7 +348,8 @@ export class ScoreOperations {
             )
         `, [userId]);
 
-        return result[0].user_rank;
+        const rankingResult = result as any[];
+        return rankingResult[0].user_rank;
     }
 }
 

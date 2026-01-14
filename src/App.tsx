@@ -34,25 +34,41 @@ export default function App() {
     }
   }, []);
 
-  const handleLogin = (username: string, email: string) => {
-    // Check if user exists in localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    let user = users.find((u: User) => u.email === email);
+  const handleLogin = (username: string, email: string, dbUser?: any) => {
+    let user: User;
 
-    if (!user) {
-      // Create new user
+    if (dbUser) {
+      // User from database
       user = {
-        id: Date.now().toString(),
-        username,
-        email,
+        id: dbUser.user_id.toString(),
+        username: dbUser.username,
+        email: dbUser.email,
         scores: {
-          accidentSimulation: 0,
-          emergencyReporting: 0,
-          cybercrimeDetection: 0,
+          accidentSimulation: dbUser.accident_best_score || 0,
+          emergencyReporting: dbUser.emergency_best_score || 0,
+          cybercrimeDetection: dbUser.cybercrime_best_score || 0,
         },
       };
-      users.push(user);
-      localStorage.setItem('users', JSON.stringify(users));
+    } else {
+      // Fallback to localStorage for backward compatibility
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      let existingUser = users.find((u: User) => u.email === email);
+
+      if (!existingUser) {
+        existingUser = {
+          id: Date.now().toString(),
+          username,
+          email,
+          scores: {
+            accidentSimulation: 0,
+            emergencyReporting: 0,
+            cybercrimeDetection: 0,
+          },
+        };
+        users.push(existingUser);
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      user = existingUser;
     }
 
     setCurrentUser(user);

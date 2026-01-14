@@ -1,25 +1,27 @@
 # Interactive Safety Simulator - Database Solution
 
-A comprehensive MySQL database solution for the Interactive Safety Simulator application with complete ERD, CRUD operations, and maintenance utilities.
+A comprehensive MySQL database solution for the Interactive Safety Simulator
+application with complete ERD, CRUD operations, and maintenance utilities.
 
 ## 📋 Table of Contents
 
-- [Overview](#-overview)
-- [Database Schema](#-database-schema)
-- [Quick Start](#-quick-start)
-- [File Structure](#-file-structure)
-- [Installation & Setup](#-installation--setup)
-- [CRUD Operations](#-crud-operations)
-- [Database Utilities](#-database-utilities)
-- [Maintenance Tasks](#-maintenance-tasks)
-- [API Integration](#-api-integration)
-- [Performance Optimization](#-performance-optimization)
-- [Security Best Practices](#-security-best-practices)
-- [Troubleshooting](#-troubleshooting)
+- [Overview](#overview)
+- [Database Schema](#database-schema)
+- [Quick Start](#quick-start)
+- [File Structure](#file-structure)
+- [Installation & Setup](#installation--setup)
+- [CRUD Operations](#crud-operations)
+- [Database Utilities](#database-utilities)
+- [Maintenance Tasks](#maintenance-tasks)
+- [API Integration](#api-integration)
+- [Performance Optimization](#performance-optimization)
+- [Security Best Practices](#security-best-practices)
+- [Troubleshooting](#troubleshooting)
 
-## 🎯 Overview
+## Overview
 
-This database solution provides a complete backend infrastructure for an Interactive Safety Simulator application with three main training modules:
+This database solution provides a complete backend infrastructure for an
+Interactive Safety Simulator application with three main training modules:
 
 - **Accident Simulation**: Road traffic and workplace accident scenarios
 - **Emergency Reporting**: Medical, fire, and crime emergency response training
@@ -36,7 +38,7 @@ This database solution provides a complete backend infrastructure for an Interac
 ✅ **Security Best Practices**  
 ✅ **Scalable Architecture**
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Entity Relationship Diagram (ERD)
 
@@ -53,17 +55,17 @@ All Scenarios            - Emergency_Scenarios
 
 ### Core Tables
 
-| Table | Purpose | Key Features |
+|Table|Purpose|Key Features|
 |-------|---------|--------------|
-| **Users** | User management | Authentication, profile data |
-| **Accident_Scenarios** | Traffic/workplace scenarios | Multiple choice questions |
-| **Emergency_Scenarios** | Emergency response training | Action-based scenarios |
-| **Cybercrime_Messages** | Cybersecurity training | Real scam examples |
-| **User_Sessions** | Training session tracking | Progress & scoring |
-| **User_Responses** | Individual answer tracking | Response analytics |
-| **User_Score_Summary** | Aggregated performance data | Leaderboards & rankings |
+|**Users**|User management|Authentication, profile data|
+|**Accident_Scenarios**|Traffic/workplace scenarios|Multiple choice questions|
+|**Emergency_Scenarios**|Emergency response training|Action-based scenarios|
+|**Cybercrime_Messages**|Cybersecurity training|Real scam examples|
+|**User_Sessions**|Training session tracking|Progress & scoring|
+|**User_Responses**|Individual answer tracking|Response analytics|
+|**User_Score_Summary**|Aggregated performance data|Leaderboards & rankings|
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Database Setup
 
@@ -96,7 +98,7 @@ node database-connection.js
 mysql -u root -p -e "SELECT 'Connection successful' AS status;"
 ```
 
-## 📁 File Structure
+## File Structure
 
 ```text
 database/
@@ -111,7 +113,7 @@ database/
 └── test-connection.js         # Connection testing script
 ```
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 
@@ -157,7 +159,7 @@ database/
    node database-connection.js
    ```
 
-## 🔧 CRUD Operations
+## CRUD Operations
 
 ### User Management
 
@@ -224,7 +226,7 @@ const engagement = await AnalyticsOperations.getUserEngagementStats(30);
 const popularity = await AnalyticsOperations.getModulePopularity();
 ```
 
-## 🛠️ Database Utilities
+## Database Utilities
 
 ### Connection Management
 
@@ -255,7 +257,7 @@ const health = await checkDatabaseHealth();
 console.log(health); // { status: 'healthy', timestamp: '...' }
 ```
 
-## 🔧 Maintenance Tasks
+## Maintenance Tasks
 
 ### Automated Maintenance
 
@@ -294,7 +296,7 @@ ANALYZE TABLE Users, Accident_Scenarios, User_Sessions;
 OPTIMIZE TABLE Users, Accident_Scenarios, User_Sessions;
 ```
 
-## 🔌 API Integration
+## API Integration
 
 ### Express.js Integration
 
@@ -363,7 +365,9 @@ const useAuth = () => {
 
 // React hook for scenario management
 const useScenarios = () => {
-    const getRandomScenario = async (moduleType: 'accident' | 'emergency' | 'cybercrime') => {
+    const getRandomScenario = async (
+        moduleType: 'accident' | 'emergency' | 'cybercrime'
+    ) => {
         try {
             const scenario = await ScenarioOperations.getRandomScenario(moduleType);
             return { success: true, scenario };
@@ -371,12 +375,12 @@ const useScenarios = () => {
             return { success: false, error: error.message };
         }
     };
-    
+
     return { getRandomScenario };
 };
 ```
 
-## 📊 Performance Optimization
+## Performance Optimization
 
 ### Indexing Strategy
 
@@ -417,7 +421,7 @@ GROUP BY s.scenario_id
 ORDER BY attempts DESC;
 ```
 
-## 🔒 Security Best Practices
+## Security Best Practices
 
 ### Password Security
 
@@ -456,7 +460,7 @@ CREATE TABLE Users (
 );
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -609,7 +613,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For questions or issues:
 
-1. Check the [Troubleshooting](#-troubleshooting) section
+1. Check the [Troubleshooting](#troubleshooting) section
 2. Review the [CRUD Operations Guide](CRUD_Operations.md)
 3. Check the [ERD Documentation](ERD.md)
 4. Run maintenance diagnostics: `node maintenance-tasks.js check`

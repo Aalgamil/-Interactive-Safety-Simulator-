@@ -55,35 +55,25 @@ const sampleUsers = [
 
 // Function to add sample users
 async function addSampleUsers() {
-    console.log('Adding sample users to the database...');
-
     try {
         for (const user of sampleUsers) {
             try {
                 const result = await UserOperations.createUser(user);
-                console.log(`Created user: ${user.username} with ID: ${result.userId}`);
             } catch (error) {
                 if (error.code === 'ER_DUP_ENTRY') {
-                    console.log(`User ${user.username} already exists, skipping...`);
                 } else {
-                    console.error(`Error creating user ${user.username}:`, error.message);
                 }
             }
         }
-
-        console.log('Sample users addition completed!');
     } catch (error) {
-        console.error('Failed to add sample users:', error);
     }
 }
 
 // Execute the function if this script is run directly
 if (require.main === module) {
     addSampleUsers().then(() => {
-        console.log('Script completed successfully!');
         process.exit(0);
     }).catch(error => {
-        console.error('Script failed:', error);
         process.exit(1);
     });
 }

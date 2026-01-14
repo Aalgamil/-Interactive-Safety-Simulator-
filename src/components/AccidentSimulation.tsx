@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { accidentScenarios } from '../data/accidentScenarios';
@@ -15,27 +15,33 @@ export function AccidentSimulation({ onComplete, onBack }: AccidentSimulationPro
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (progressRef.current) {
+      progressRef.current.style.width = `${((currentStep + 1) / accidentScenarios.length) * 100}%`;
+    }
+  }, [currentStep]);
 
   const handleOptionSelect = (index: number) => {
     if (showFeedback) return;
-    
+
     setSelectedOption(index);
     setShowFeedback(true);
-
-    if (accidentScenarios[currentStep].options[index].correct) {
-      setScore(score + 20);
-    }
   };
 
   const handleNext = () => {
+    const isCorrect = accidentScenarios[currentStep].options[selectedOption!].correct;
+    const newScore = score + (isCorrect ? 20 : 0);
+    setScore(newScore);
+
     if (currentStep < accidentScenarios.length - 1) {
       setCurrentStep(currentStep + 1);
       setSelectedOption(null);
       setShowFeedback(false);
     } else {
-      const finalScore = score + (accidentScenarios[currentStep].options[selectedOption!].correct ? 20 : 0);
       setIsComplete(true);
-      onComplete(finalScore);
+      onComplete(newScore);
     }
   };
 
@@ -55,16 +61,15 @@ export function AccidentSimulation({ onComplete, onBack }: AccidentSimulationPro
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
             <div className="text-center">
-              <div className={`size-24 rounded-full mx-auto mb-6 flex items-center justify-center ${
-                score >= 80 ? 'bg-green-100' : score >= 60 ? 'bg-yellow-100' : 'bg-red-100'
-              }`}>
+              <div className={`size-24 rounded-full mx-auto mb-6 flex items-center justify-center ${score >= 80 ? 'bg-green-100' : score >= 60 ? 'bg-yellow-100' : 'bg-red-100'
+                }`}>
                 {score >= 80 ? (
                   <CheckCircle className={`size-12 text-green-600`} />
                 ) : (
                   <AlertTriangle className={`size-12 ${score >= 60 ? 'text-yellow-600' : 'text-red-600'}`} />
                 )}
               </div>
-              
+
               <h1 className="text-4xl mb-4">{t('accident.complete')}</h1>
               <p className="text-xl text-gray-600 mb-8">
                 {t('accident.yourScore')}: <span className="text-[#006B3F]">{score} / 100</span>
@@ -128,8 +133,8 @@ export function AccidentSimulation({ onComplete, onBack }: AccidentSimulationPro
           <div className="mb-8">
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
+                ref={progressRef}
                 className="bg-[#006B3F] h-3 rounded-full transition-all"
-                style={{ width: `${((currentStep + 1) / accidentScenarios.length) * 100}%` }}
               />
             </div>
           </div>
@@ -152,13 +157,12 @@ export function AccidentSimulation({ onComplete, onBack }: AccidentSimulationPro
                   key={index}
                   onClick={() => handleOptionSelect(index)}
                   disabled={showFeedback}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                    selectedOption === index
-                      ? option.correct
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-red-500 bg-red-50'
-                      : 'border-gray-200 hover:border-[#006B3F] hover:bg-gray-50'
-                  } ${showFeedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${selectedOption === index
+                    ? option.correct
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-red-500 bg-red-50'
+                    : 'border-gray-200 hover:border-[#006B3F] hover:bg-gray-50'
+                    } ${showFeedback ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{option.text[language]}</span>
@@ -176,11 +180,10 @@ export function AccidentSimulation({ onComplete, onBack }: AccidentSimulationPro
 
             {/* Feedback */}
             {showFeedback && selectedOption !== null && (
-              <div className={`mt-6 p-4 rounded-lg ${
-                currentScenario.options[selectedOption].correct
-                  ? 'bg-green-50 border border-green-200'
-                  : 'bg-red-50 border border-red-200'
-              }`}>
+              <div className={`mt-6 p-4 rounded-lg ${currentScenario.options[selectedOption].correct
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-red-50 border border-red-200'
+                }`}>
                 <p className={
                   currentScenario.options[selectedOption].correct
                     ? 'text-green-800'

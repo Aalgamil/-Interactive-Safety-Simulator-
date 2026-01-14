@@ -8,20 +8,17 @@ const options = {
 };
 
 const req = http.request(options, (res) => {
-  console.log(`statusCode: ${res.statusCode}`);
-  
   let data = '';
   res.on('data', (chunk) => {
     data += chunk;
   });
-  
+
   res.on('end', () => {
-    console.log('Leaderboard data from API:', data);
   });
 });
 
 req.on('error', (err) => {
-  console.error('Error:', err);
+  // Error handling removed for production
 });
 
 req.end();

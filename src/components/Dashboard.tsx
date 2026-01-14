@@ -2,6 +2,7 @@ import { Shield, Target, Zap, Trophy, LogOut, User, BarChart3 } from 'lucide-rea
 import type { Page, User as UserType } from '../App';
 import { useLanguage } from '../contexts/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
+import './Dashboard.css';
 
 interface DashboardProps {
   user: UserType;
@@ -99,11 +100,8 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
                       <span className="text-gray-600">{t('dashboard.bestScore')}</span>
                       <span className="text-[#006B3F]">{user.scores.accidentSimulation} / 100</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-[#006B3F] h-3 rounded-full transition-all"
-                        style={{ width: `${user.scores.accidentSimulation}%` }}
-                      />
+                    <div className="w-full bg-gray-200 rounded-full h-3" style={{ '--progress-width': `${user.scores.accidentSimulation}%` } as any}>
+                      <div className="progress-fill" />
                     </div>
                   </div>
                   <button
@@ -128,11 +126,8 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
                       <span className="text-gray-600">{t('dashboard.bestScore')}</span>
                       <span className="text-[#006B3F]">{user.scores.emergencyReporting} / 100</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-[#006B3F] h-3 rounded-full transition-all"
-                        style={{ width: `${user.scores.emergencyReporting}%` }}
-                      />
+                    <div className="w-full bg-gray-200 rounded-full h-3" style={{ '--progress-width': `${user.scores.emergencyReporting}%` } as any}>
+                      <div className="progress-fill" />
                     </div>
                   </div>
                   <button
@@ -157,11 +152,8 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
                       <span className="text-gray-600">{t('dashboard.bestScore')}</span>
                       <span className="text-[#006B3F]">{user.scores.cybercrimeDetection} / 100</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-[#006B3F] h-3 rounded-full transition-all"
-                        style={{ width: `${user.scores.cybercrimeDetection}%` }}
-                      />
+                    <div className="w-full bg-gray-200 rounded-full h-3" style={{ '--progress-width': `${user.scores.cybercrimeDetection}%` } as any}>
+                      <div className="progress-fill" />
                     </div>
                   </div>
                   <button
