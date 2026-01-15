@@ -4,6 +4,10 @@
 import mysql, { Pool, PoolConnection } from 'mysql2/promise';
 import * as bcrypt from 'bcryptjs';
 
+// Logging configuration
+const isProduction = process.env.NODE_ENV === 'production';
+const enableLogging = process.env.DB_ENABLE_LOGGING !== 'false';
+
 // Database configuration
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
@@ -37,14 +41,15 @@ export class DatabaseConnection {
 
     private initializePool() {
         pool = mysql.createPool(dbConfig);
-        console.log('Database connection pool initialized');
     }
 
     public async getConnection(): Promise<PoolConnection> {
         try {
             return await pool.getConnection();
         } catch (error) {
-            console.error('Failed to get database connection:', error);
+            if (!isProduction && enableLogging) {
+                console.error('Failed to get database connection:', error);
+            }
             throw new Error('Database connection failed');
         }
     }
@@ -55,7 +60,9 @@ export class DatabaseConnection {
             const [rows, fields] = await connection.execute(query, params);
             return rows;
         } catch (error) {
-            console.error('Query execution failed:', error);
+            if (!isProduction && enableLogging) {
+                console.error('Query execution failed:', error);
+            }
             throw error;
         } finally {
             connection.release();
@@ -77,7 +84,9 @@ export class DatabaseConnection {
             return results;
         } catch (error) {
             await connection.rollback();
-            console.error('Transaction failed:', error);
+            if (!isProduction && enableLogging) {
+                console.error('Transaction failed:', error);
+            }
             throw error;
         } finally {
             connection.release();
@@ -87,7 +96,6 @@ export class DatabaseConnection {
     public async closePool(): Promise<void> {
         if (pool) {
             await pool.end();
-            console.log('Database connection pool closed');
         }
     }
 }

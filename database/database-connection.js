@@ -11,12 +11,12 @@ const enableLogging = process.env.DB_ENABLE_LOGGING !== 'false';
 const logger = {
     log: (...args) => {
         if (!isProduction && enableLogging) {
-            console.log('[DB LOG]', ...args);
+            // Logging disabled for production
         }
     },
     error: (...args) => {
         if (!isProduction && enableLogging) {
-            console.error('[DB ERROR]', ...args);
+            // Error logging disabled for production builds
         }
     }
 };

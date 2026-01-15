@@ -63,8 +63,6 @@ export function Login({ onLogin, onNavigate }: LoginProps) {
           ? { username, password }
           : { username, email, password, fullName };
 
-        console.log('Sending request to:', endpoint, 'with body:', body);
-
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -73,11 +71,7 @@ export function Login({ onLogin, onNavigate }: LoginProps) {
           body: JSON.stringify(body),
         });
 
-        console.log('Response status:', response.status);
-
         const data = await response.json();
-
-        console.log('Response data:', data);
 
         if (response.ok) {
           setSuccessMessage(isLogin ? 'Login successful!' : 'Registration successful!');

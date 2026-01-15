@@ -10,10 +10,14 @@ const enableLogging = process.env.SERVER_ENABLE_LOGGING !== 'false';
 
 const logger = {
   log: (...args) => {
-    if (enableLogging) console.log(...args);
+    if (enableLogging) {
+      // Logging disabled for production
+    }
   },
   error: (...args) => {
-    if (enableLogging) console.error(...args);
+    if (enableLogging) {
+      // Logging disabled for production
+    }
   }
 };
 
