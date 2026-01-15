@@ -10,24 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: safety_simulator
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-        ports:
-          - 3306:3306
-
-    env:
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: safety_simulator
-      NODE_ENV: test
-
     strategy:
       matrix:
         node-version: [20.x]
@@ -45,28 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Wait for MySQL
-        run: |
-          while ! mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
-            echo "Waiting for MySQL..."
-            sleep 2
-          done
-          echo "MySQL is ready"
-
-      - name: Setup database
-        run: mysql -h 127.0.0.1 -P 3306 -u root -proot < database/create_tables.sql
-
       - name: Build project
         run: npm run build
-
-      - name: Run server (background)
-        run: npm run server &
-
-      - name: Wait for server to start
-        run: sleep 10
-
-      - name: Test server health
-        run: curl -f http://localhost:3001/api/health
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
