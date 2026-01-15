@@ -30,4 +30,4 @@ jobs:
         run: npx depcheck
 
       - name: Check for linting issues
-        run: npm run lint --if-present
+        run: npm run lint
