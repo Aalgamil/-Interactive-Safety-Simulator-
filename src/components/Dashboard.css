@@ -3,5 +3,4 @@
     height: 12px;
     border-radius: 6px;
     transition: all;
-    width: var(--progress-width);
 }

@@ -35,7 +35,7 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
               </button>
               <div className="flex items-center gap-2">
                 <User className="size-5" />
-                <span>{user.username}</span>
+                <span>{user.fullName || user.username}</span>
               </div>
               <button
                 onClick={onLogout}
@@ -53,7 +53,7 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
       <div className="py-12">
         <div className="container mx-auto px-6">
           <div className="mb-8">
-            <h1 className="text-4xl mb-2">{t('dashboard.welcome')}, {user.username}!</h1>
+            <h1 className="text-4xl mb-2">{t('dashboard.welcome')}, {user.fullName || user.username}!</h1>
             <p className="text-gray-600">{t('dashboard.subtitle')}</p>
           </div>
 
@@ -100,8 +100,8 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
                       <span className="text-gray-600">{t('dashboard.bestScore')}</span>
                       <span className="text-[#006B3F]">{user.scores.accidentSimulation} / 100</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3" style={{ '--progress-width': `${user.scores.accidentSimulation}%` } as any}>
-                      <div className="progress-fill" />
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="progress-fill" style={{ ['--progress-width' as any]: `${user.scores.accidentSimulation}%` }} />
                     </div>
                   </div>
                   <button
@@ -126,8 +126,8 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
                       <span className="text-gray-600">{t('dashboard.bestScore')}</span>
                       <span className="text-[#006B3F]">{user.scores.emergencyReporting} / 100</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3" style={{ '--progress-width': `${user.scores.emergencyReporting}%` } as any}>
-                      <div className="progress-fill" />
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="progress-fill" style={{ ['--progress-width' as any]: `${user.scores.emergencyReporting}%` }} />
                     </div>
                   </div>
                   <button
@@ -152,8 +152,8 @@ export function Dashboard({ user, onNavigate, onLogout }: DashboardProps) {
                       <span className="text-gray-600">{t('dashboard.bestScore')}</span>
                       <span className="text-[#006B3F]">{user.scores.cybercrimeDetection} / 100</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3" style={{ '--progress-width': `${user.scores.cybercrimeDetection}%` } as any}>
-                      <div className="progress-fill" />
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="progress-fill" style={{ ['--progress-width' as any]: `${user.scores.cybercrimeDetection}%` }} />
                     </div>
                   </div>
                   <button

@@ -11,12 +11,12 @@ const enableLogging = process.env.DB_ENABLE_LOGGING !== 'false';
 const logger = {
     log: (...args) => {
         if (!isProduction && enableLogging) {
-            // Logging stripped for production builds
+            console.log('[DB LOG]', ...args);
         }
     },
     error: (...args) => {
         if (!isProduction && enableLogging) {
-            // Error logging stripped for production builds
+            console.error('[DB ERROR]', ...args);
         }
     }
 };
@@ -116,11 +116,22 @@ class DatabaseConnection {
 class UserOperations {
     static async createUser(userData) {
         const bcrypt = require('bcryptjs');
+
+        // Check if user already exists
+        const existingUser = await new DatabaseConnection().executeQuery(
+            'SELECT user_id FROM Users WHERE username = ? OR email = ?',
+            [userData.username, userData.email]
+        );
+
+        if (existingUser.length > 0) {
+            throw new Error('User with this username or email already exists');
+        }
+
         const hashedPassword = await bcrypt.hash(userData.password, 10);
 
         const queries = [
             {
-                query: `INSERT INTO Users (username, email, password_hash, full_name) 
+                query: `INSERT INTO Users (username, email, password_hash, full_name)
                         VALUES (?, ?, ?, ?)`,
                 params: [userData.username, userData.email, hashedPassword, userData.fullName]
             },
@@ -138,10 +149,12 @@ class UserOperations {
         const bcrypt = require('bcryptjs');
         const db = new DatabaseConnection();
 
+
         const user = await db.executeQuery(
             'SELECT * FROM Users WHERE username = ? AND is_active = TRUE',
             [username]
         );
+
 
         if (user.length === 0) {
             throw new Error('User not found or inactive');
@@ -149,6 +162,7 @@ class UserOperations {
 
         const userRecord = user[0];
         const isValidPassword = await bcrypt.compare(password, userRecord.password_hash);
+
 
         if (!isValidPassword) {
             throw new Error('Invalid password');

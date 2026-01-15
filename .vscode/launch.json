@@ -5,7 +5,7 @@
       "name": "Launch Chrome",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000",
+      "url": "http://localhost:3001",
       "webRoot": "${workspaceFolder}/src",
       "sourceMapPathOverrides": {
         "webpack:///./*": "${webRoot}/*",
@@ -14,13 +14,13 @@
         "webpack:///.*": ":///./*",
         ":///*": "${workspaceFolder}/*"
       },
-      "preLaunchTask": "npm: dev"
+      "preLaunchTask": "npm: server"
     },
     {
       "name": "Launch Chrome with existing instance",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000",
+      "url": "http://localhost:3001",
       "webRoot": "${workspaceFolder}/src",
       "sourceMapPathOverrides": {
         "webpack:///./*": "${webRoot}/*",

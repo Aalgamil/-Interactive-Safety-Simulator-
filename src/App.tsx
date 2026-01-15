@@ -12,6 +12,7 @@ export type User = {
   id: string;
   username: string;
   email: string;
+  fullName?: string;
   scores: {
     accidentSimulation: number;
     emergencyReporting: number;
@@ -43,6 +44,7 @@ export default function App() {
         id: dbUser.user_id.toString(),
         username: dbUser.username,
         email: dbUser.email,
+        fullName: dbUser.full_name,
         scores: {
           accidentSimulation: dbUser.accident_best_score || 0,
           emergencyReporting: dbUser.emergency_best_score || 0,
@@ -82,26 +84,67 @@ export default function App() {
     setCurrentPage('home');
   };
 
-  const updateScore = (gameType: keyof User['scores'], score: number) => {
+  const updateScore = async (gameType: keyof User['scores'], score: number) => {
     if (!currentUser) return;
 
-    const updatedUser = {
-      ...currentUser,
-      scores: {
-        ...currentUser.scores,
-        [gameType]: Math.max(currentUser.scores[gameType], score),
-      },
-    };
+    try {
+      // Map game types to module types expected by the API
+      const moduleTypeMap = {
+        accidentSimulation: 'accident',
+        emergencyReporting: 'emergency',
+        cybercrimeDetection: 'cybercrime'
+      };
 
-    setCurrentUser(updatedUser);
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      const moduleType = moduleTypeMap[gameType];
 
-    // Update in users array
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const userIndex = users.findIndex((u: User) => u.id === currentUser.id);
-    if (userIndex !== -1) {
-      users[userIndex] = updatedUser;
-      localStorage.setItem('users', JSON.stringify(users));
+      // Call API to update score in database
+      const response = await fetch(`/api/users/${currentUser.id}/scores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moduleType,
+          score
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update score');
+      }
+
+      // Update local state with the new score (take the max)
+      const updatedUser = {
+        ...currentUser,
+        scores: {
+          ...currentUser.scores,
+          [gameType]: Math.max(currentUser.scores[gameType], score),
+        },
+      };
+
+      setCurrentUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+      // Update in users array for backward compatibility
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userIndex = users.findIndex((u: User) => u.id === currentUser.id);
+      if (userIndex !== -1) {
+        users[userIndex] = updatedUser;
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+    } catch (error) {
+      console.error('Error updating score:', error);
+      // Fallback to local update if API fails
+      const updatedUser = {
+        ...currentUser,
+        scores: {
+          ...currentUser.scores,
+          [gameType]: Math.max(currentUser.scores[gameType], score),
+        },
+      };
+
+      setCurrentUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
     }
   };
 

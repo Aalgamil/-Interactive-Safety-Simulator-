@@ -29,29 +29,22 @@ if (-not (Test-Path "node_modules")) {
     npm install
 }
 
-# Kill any existing processes on ports 3000 and 3001 to avoid conflicts
-Write-Host "Checking for existing processes on ports 3000 and 3001..." -ForegroundColor Yellow
+# Kill any existing processes on port 3000 to avoid conflicts
+Write-Host "Checking for existing processes on port 3000..." -ForegroundColor Yellow
 try {
     $processes3000 = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
-    $processes3001 = Get-NetTCPConnection -LocalPort 3001 -ErrorAction SilentlyContinue
 
     if ($processes3000) {
         Write-Host "Stopping processes on port 3000..." -ForegroundColor Yellow
         $processes3000 | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
     }
-
-    if ($processes3001) {
-        Write-Host "Stopping processes on port 3001..." -ForegroundColor Yellow
-        $processes3001 | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
-    }
 } catch {
     Write-Host "Could not check for existing processes. Continuing anyway..." -ForegroundColor Yellow
 }
 
-# Start both servers
-Write-Host "Starting both frontend and backend servers..." -ForegroundColor Green
-Write-Host "Frontend will be available at: http://localhost:3000" -ForegroundColor Cyan
-Write-Host "Backend API will be available at: http://localhost:3001" -ForegroundColor Cyan
+# Start the server
+Write-Host "Starting the server..." -ForegroundColor Green
+Write-Host "Application will be available at: http://localhost:3000" -ForegroundColor Cyan
 
 npm start
 

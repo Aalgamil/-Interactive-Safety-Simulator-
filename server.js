@@ -10,10 +10,10 @@ const enableLogging = process.env.SERVER_ENABLE_LOGGING !== 'false';
 
 const logger = {
   log: (...args) => {
-    // Logging disabled for audit compliance - console.log stripped
+    if (enableLogging) console.log(...args);
   },
   error: (...args) => {
-    // Logging disabled for audit compliance - console.error stripped
+    if (enableLogging) console.error(...args);
   }
 };
 
@@ -22,7 +22,8 @@ const {
   ScoreOperations,
   AnalyticsOperations,
   UserOperations,
-  ScenarioOperations
+  ScenarioOperations,
+  SessionOperations
 } = require('./database/database-connection.js');
 
 const app = express();
@@ -148,6 +149,82 @@ app.get('/api/scenarios/:type', async (req, res) => {
   }
 });
 
+// Start a new game session
+app.post('/api/sessions/start', async (req, res) => {
+  try {
+    const { userId, moduleType, scenarioId } = req.body;
+
+    if (!userId || !moduleType) {
+      return res.status(400).json({ error: 'userId and moduleType are required' });
+    }
+
+    const session = await SessionOperations.startSession(userId, moduleType, scenarioId);
+    res.json(session);
+  } catch (error) {
+    logger.error('Error starting session:', error);
+    res.status(500).json({ error: 'Failed to start session' });
+  }
+});
+
+// Record a user response in a session
+app.post('/api/sessions/:sessionId/responses', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { scenarioId, moduleType, userAnswer, isCorrect, responseTime } = req.body;
+
+    if (!scenarioId || !moduleType || userAnswer === undefined || isCorrect === undefined) {
+      return res.status(400).json({ error: 'scenarioId, moduleType, userAnswer, and isCorrect are required' });
+    }
+
+    await SessionOperations.recordResponse(sessionId, scenarioId, moduleType, userAnswer, isCorrect, responseTime || 0);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error recording response:', error);
+    res.status(500).json({ error: 'Failed to record response' });
+  }
+});
+
+// Complete a game session and update scores
+app.post('/api/sessions/:sessionId/complete', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { score, correctAnswers, totalQuestions, userId, moduleType } = req.body;
+
+    if (!score || correctAnswers === undefined || totalQuestions === undefined || !userId || !moduleType) {
+      return res.status(400).json({ error: 'score, correctAnswers, totalQuestions, userId, and moduleType are required' });
+    }
+
+    // Complete the session
+    await SessionOperations.completeSession(sessionId, score, correctAnswers, totalQuestions);
+
+    // Update user scores
+    await ScoreOperations.updateUserScore(userId, moduleType, score);
+
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error completing session:', error);
+    res.status(500).json({ error: 'Failed to complete session' });
+  }
+});
+
+// Update user score (alternative endpoint for direct score updates)
+app.post('/api/users/:userId/scores', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { moduleType, score } = req.body;
+
+    if (!moduleType || score === undefined) {
+      return res.status(400).json({ error: 'moduleType and score are required' });
+    }
+
+    await ScoreOperations.updateUserScore(userId, moduleType, score);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error updating user score:', error);
+    res.status(500).json({ error: 'Failed to update user score' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running', timestamp: new Date().toISOString() });
@@ -163,7 +240,7 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '127.0.0.1', () => {
   logger.log(`Server is running on port ${PORT}`);
   logger.log(`Server address: http://localhost:${PORT}`);
 });

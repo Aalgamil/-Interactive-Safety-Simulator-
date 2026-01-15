@@ -29,10 +29,12 @@ export function Login({ onLogin, onNavigate }: LoginProps) {
       newErrors.username = t('login.username.minlength');
     }
 
-    if (!email.trim()) {
-      newErrors.email = t('login.email.required');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = t('login.email.invalid');
+    if (!isLogin) {
+      if (!email.trim()) {
+        newErrors.email = t('login.email.required');
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        newErrors.email = t('login.email.invalid');
+      }
     }
 
     if (!password.trim()) {
@@ -61,6 +63,8 @@ export function Login({ onLogin, onNavigate }: LoginProps) {
           ? { username, password }
           : { username, email, password, fullName };
 
+        console.log('Sending request to:', endpoint, 'with body:', body);
+
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -69,7 +73,11 @@ export function Login({ onLogin, onNavigate }: LoginProps) {
           body: JSON.stringify(body),
         });
 
+        console.log('Response status:', response.status);
+
         const data = await response.json();
+
+        console.log('Response data:', data);
 
         if (response.ok) {
           setSuccessMessage(isLogin ? 'Login successful!' : 'Registration successful!');
